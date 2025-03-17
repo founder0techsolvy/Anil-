@@ -174,47 +174,58 @@ function previewImage(event, previewId) {
   }
 }
 
-// ✅ Save Data to sessionStorage
-document.getElementById("orderBtn").addEventListener("click", function() {
-  const productData = {
-    name: "Ayushman PVC Card",
-    price: "₹99",
-    type: "PVC Ayushman Card",
-    fullName: document.getElementById("fullName").value,
-    address: document.getElementById("address").value,
-    city: document.getElementById("city").value,
-    state: document.getElementById("state").value,
-    pincode: document.getElementById("pincode").value,
-    mobile: document.getElementById("mobile").value
-  };
-  
-  const fileInputFront = document.getElementById("fileInputFront").files[0];
-  const fileInputBack = document.getElementById("fileInputBack").files[0];
-  
-  if (!fileInputFront || !fileInputBack) {
-    alert("❌ Please upload both front and back images!");
-    return;
-  }
-  
-  // ✅ Convert Front Image to Base64
-  const readerFront = new FileReader();
-  readerFront.readAsDataURL(fileInputFront);
-  readerFront.onload = function() {
-    productData.image1 = readerFront.result;
-    
-    // ✅ Convert Back Image to Base64 AFTER Front Image is Loaded
-    const readerBack = new FileReader();
-    readerBack.readAsDataURL(fileInputBack);
-    readerBack.onload = function() {
-      productData.image2 = readerBack.result;
-      
-      // ✅ Save to sessionStorage AFTER both images are processed
-      sessionStorage.setItem("orderDetails", JSON.stringify(productData));
-      
-      // ✅ Redirect to Checkout Page
-      window.location.href = "checkout.html";
-    };
-  };
+// ✅ Check Image Size Function
+function checkImageSize(fileInput, maxSizeMB) {
+const file = fileInput.files[0]; // Get selected file
+if (file && file.size > maxSizeMB * 1024 * 1024) {
+alert(❌ Image size is too large! Please upload a compressed image under ${maxSizeMB}MB.);
+return false;
+}
+return true;
+}
+
+// ✅ Modify Order Button Click Event
+document.getElementById("orderBtn").addEventListener("click", function () {
+const fileInputFront = document.getElementById("fileInputFront");
+const fileInputBack = document.getElementById("fileInputBack");
+
+// ✅ Check Image Size (Max 2MB per Image)  
+if (!checkImageSize(fileInputFront, 2) || !checkImageSize(fileInputBack, 2)) {  
+    return; // Stop checkout if images are too large  
+}  
+
+// ✅ Proceed with order if images are valid  
+const productData = {  
+    name: "Ayushman PVC Card",  
+    price: "₹99",  
+    type: "PVC Ayushman Card",  
+    fullName: document.getElementById("fullName").value,  
+    address: document.getElementById("address").value,  
+    city: document.getElementById("city").value,  
+    state: document.getElementById("state").value,  
+    pincode: document.getElementById("pincode").value,  
+    mobile: document.getElementById("mobile").value  
+};  
+
+// ✅ Convert Images to Base64  
+const readerFront = new FileReader();  
+readerFront.readAsDataURL(fileInputFront.files[0]);  
+readerFront.onload = function () {  
+    productData.image1 = readerFront.result;  
+
+    const readerBack = new FileReader();  
+    readerBack.readAsDataURL(fileInputBack.files[0]);  
+    readerBack.onload = function () {  
+        productData.image2 = readerBack.result;  
+
+        // ✅ Save to sessionStorage  
+        sessionStorage.setItem("orderDetails", JSON.stringify(productData));  
+
+        // ✅ Redirect to Checkout Page  
+        window.location.href = "checkout.html";  
+    };  
+};
+
 });
 console.log("Saved Order Details:", sessionStorage.getItem("orderDetails"));
 
