@@ -156,79 +156,77 @@
 
 
 <script>
-document.getElementById("fileInputFront").addEventListener("change", function(event) {
-  previewImage(event, "previewFront");
+document.getElementById("fileInputFront").addEventListener("change", function (event) {
+    previewImage(event, "previewFront");
 });
-document.getElementById("fileInputBack").addEventListener("change", function(event) {
-  previewImage(event, "previewBack");
+document.getElementById("fileInputBack").addEventListener("change", function (event) {
+    previewImage(event, "previewBack");
 });
 
 function previewImage(event, previewId) {
-  const file = event.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      document.getElementById(previewId).src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            document.getElementById(previewId).src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
 }
-
-// ✅ Save Data to sessionStorage
 // ✅ Check Image Size Function
 function checkImageSize(fileInput, maxSizeMB) {
-const file = fileInput.files[0]; // Get selected file
-if (file && file.size > maxSizeMB * 1024 * 1024) {
-alert(❌ Image size is too large! Please upload a compressed image under ${maxSizeMB}MB.);
-return false;
-}
-return true;
+    const file = fileInput.files[0]; // Get selected file
+    if (file && file.size > maxSizeMB * 1024 * 1024) { 
+        alert(`❌ Image size is too large! Please upload a compressed image under ${maxSizeMB}MB.`);
+        return false; 
+    }
+    return true;
 }
 
 // ✅ Modify Order Button Click Event
 document.getElementById("orderBtn").addEventListener("click", function () {
-const fileInputFront = document.getElementById("fileInputFront");
-const fileInputBack = document.getElementById("fileInputBack");
+    const fileInputFront = document.getElementById("fileInputFront");
+    const fileInputBack = document.getElementById("fileInputBack");
 
-// ✅ Check Image Size (Max 2MB per Image)  
-if (!checkImageSize(fileInputFront, 2) || !checkImageSize(fileInputBack, 2)) {  
-    return; // Stop checkout if images are too large  
-}  
+    // ✅ Check Image Size (Max 2MB per Image)
+    if (!checkImageSize(fileInputFront, 2) || !checkImageSize(fileInputBack, 2)) {
+        return; // Stop checkout if images are too large
+    }
 
-// ✅ Proceed with order if images are valid  
-const productData = {  
-    name: "ABC PVC Card",  
-    price: "₹99",  
-    type: "PVC ABC Card",  
-    fullName: document.getElementById("fullName").value,  
-    address: document.getElementById("address").value,  
-    city: document.getElementById("city").value,  
-    state: document.getElementById("state").value,  
-    pincode: document.getElementById("pincode").value,  
-    mobile: document.getElementById("mobile").value  
-};  
+    // ✅ Proceed with order if images are valid
+    const productData = {
+        name: "ABC PVC Card",
+        price: "₹99",
+        type: "PVC ABC Card",
+        fullName: document.getElementById("fullName").value,
+        address: document.getElementById("address").value,
+        city: document.getElementById("city").value,
+        state: document.getElementById("state").value,
+        pincode: document.getElementById("pincode").value,
+        mobile: document.getElementById("mobile").value
+    };
 
-// ✅ Convert Images to Base64  
-const readerFront = new FileReader();  
-readerFront.readAsDataURL(fileInputFront.files[0]);  
-readerFront.onload = function () {  
-    productData.image1 = readerFront.result;  
+    // ✅ Convert Images to Base64
+    const readerFront = new FileReader();
+    readerFront.readAsDataURL(fileInputFront.files[0]);
+    readerFront.onload = function () {
+        productData.image1 = readerFront.result;
 
-    const readerBack = new FileReader();  
-    readerBack.readAsDataURL(fileInputBack.files[0]);  
-    readerBack.onload = function () {  
-        productData.image2 = readerBack.result;  
+        const readerBack = new FileReader();
+        readerBack.readAsDataURL(fileInputBack.files[0]);
+        readerBack.onload = function () {
+            productData.image2 = readerBack.result;
 
-        // ✅ Save to sessionStorage  
-        sessionStorage.setItem("orderDetails", JSON.stringify(productData));  
+            // ✅ Save to sessionStorage
+            sessionStorage.setItem("orderDetails", JSON.stringify(productData));
 
-        // ✅ Redirect to Checkout Page  
-        window.location.href = "checkout.html";  
-    };  
-};
-
+            // ✅ Redirect to Checkout Page
+            window.location.href = "checkout.html";
+        };
+    };
 });
-console.log("Saved Order Details:", sessionStorage.getItem("orderDetails"));
+
+ console.log("Saved Order Details:", sessionStorage.getItem("orderDetails"));
 
   //menu bar toggle
   function toggleMenu() {
