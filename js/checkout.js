@@ -460,7 +460,7 @@ function showLoader() {
     loader.innerHTML = `
       <div class="loader-animation"></div>
       <div style="margin-top: 30px; width: 80%; max-width: 400px; text-align: center;">
-        <div style="position: relative; background: #eee; border-radius: 10px; overflow: hidden; height: 20px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);">
+        <div style="position: relative; background: #ffe6e6; border-radius: 10px; overflow: hidden; height: 20px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);">
           <div id="uploadProgressBar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #ff4b4b, #d80000); border-radius: 10px; transition: width 0.3s ease;"></div>
           <div id="uploadProgressText" style="position: absolute; width: 100%; top: 0; left: 0; height: 100%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; font-family: 'Segoe UI', sans-serif;">Uploading image 1: 0%</div>
         </div>
