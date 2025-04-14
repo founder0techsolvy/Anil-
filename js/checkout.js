@@ -449,7 +449,7 @@ function showLoader() {
     loader.style.left = "0";
     loader.style.width = "100vw";
     loader.style.height = "100vh";
-    loader.style.background = "rgba(255, 255, 255, 0.6)";
+    loader.style.background = "#FFFFFF";
     loader.style.backdropFilter = "blur(6px)";
     loader.style.display = "flex";
     loader.style.flexDirection = "column";
