@@ -464,7 +464,7 @@ function showLoader() {
           <div id="uploadProgressBar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #ff4b4b, #d80000); border-radius: 10px; transition: width 0.3s ease;"></div>
           <div id="uploadProgressText" style="position: absolute; width: 100%; top: 0; left: 0; height: 100%; display: flex; align-items: center; justify-content: center; font-weight: bold; background: rgba(0,0,0,0.2);  /* Add this line */ color: white; font-family: 'Segoe UI', sans-serif;">Uploading image 1: 0%</div>
         </div>
-        <div style="margin-top: 12px; font-size: 0.95rem; color: #a60000;">Please wait while we upload your files...</div>
+        <div style="margin-top: 15px; font-size: 1.5rem; color: #000000;">Please wait while we upload your files...</div>
       </div>
 <style>
 #uploadProgressBar {
