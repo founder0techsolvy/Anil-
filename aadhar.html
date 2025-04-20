@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aadhaar PVC Card Print</title>
+    <script src="https://cdn.jsdelivr.net/npm/compressorjs@1.2.1/dist/compressor.min.js"></script>
     <link rel="stylesheet" href="./css/cards.css">
 </head>
 <body>
@@ -29,41 +30,80 @@
   <div class="menu-icon" onclick="toggleMenu()">☰</div>
 </nav>
 
-<!-- ✅ Product Section -->
+<!-- ✅ Product Section with Full-width Main Image and Thumbnails -->
 <div class="product-container">
-    <img src="https://codesparshofficial.github.io/Print420/img9.png" alt="Aadhaar PVC Card">
-    <div class="product-info">
-        <h2>Aadhaar PVC Card</h2>
-        <p>Get your Aadhaar printed on a durable PVC card.</p>
-        <p class="price">Print + GST = ₹99</p>
-        <br>
-        <!-- ✅ Front & Back Image Upload -->
-        <label><strong>Upload Aadhaar Front</strong></label>
-        <input type="file" id="fileInputFront" accept="image/*">
-        <div style="height: 15px;"></div>
-        <label><strong>Upload Aadhaar Back</strong></label>
-        <input type="file" id="fileInputBack" accept="image/*">
+  <div class="product-gallery">
+    <img id="mainImage" class="main-image" src="aadhar_01.png" alt="Aadhaar PVC Card">
+<div class="thumbnail-wrapper">
+  <div class="thumbnail-container">
+    <div class="thumbnail-row">
+      <img src="https://codesparshofficial.github.io/Print420/img9.png" class="active" alt="Thumbnail 1" />
+      <img src="https://codesparshofficial.github.io/Print420/img8.png" alt="Thumbnail 2" />
+      <img src="https://codesparshofficial.github.io/Print420/img7.png" alt="Thumbnail 3" />
     </div>
+  </div>
 </div>
+  </div>
+  
+  <div class="product-info">
+    <h2>Aadhaar PVC Card</h2>
+    <p>Get your Aadhaar printed on a durable PVC card. Sleek, water-resistant, and pocket-sized.</p>
+    <p class="price">Print + GST = ₹120</p>
+    
+    <ul>
+      <li>Printed on high-quality PVC material</li>
+      <li>Delivered across India via Speed Post</li>
+      <li>Expected delivery: 5–7 working days</li>
+    </ul>
+    
+    <h4 style="margin-top: 20px; color: green;">What’s in the Package?</h4>
+    <ul>
+      <li>1x PVC Aadhaar Card</li>
+      <li>2x Free Plastic Cover to protect your card</li>
+    </ul>
+    
 
-<!-- ✅ Preview Section -->
-<div class="preview-container">
-    <h2>Uploaded Preview</h2>
-    <div class="preview-images">
-        <div>
-            <h3>Front Side</h3>
-            <img id="previewFront" src="https://via.placeholder.com/200" alt="Upload to view Front Preview">
-        </div>
-        <div>
-            <h3>Back Side</h3>
-            <img id="previewBack" src="https://via.placeholder.com/200" alt="Upload to view Back Preview">
-        </div>
-    </div>
+
+  <!-- PDF Upload Popup -->
+  <div id="pdfPopup" class="popup">
+    <h3>Upload PDF</h3>
+    <input type="file" id="fileInputPDF" accept=".pdf"><br><br>
+    <input type="text" id="pdfPassword" placeholder="Enter Password (if any)"><br><br>
+    <button id="submitPDF">Submit</button>
+  </div>
+
+  <!-- Image Upload Popup -->
+  <div id="imagePopup" class="popup">
+    <h3>Upload Front & Back Image</h3>
+    <input type="file" id="fileInputFront" accept="image/*"><br><br>
+    <input type="file" id="fileInputBack" accept="image/*"><br><br>
+    <button id="submitImages">Submit</button>
+  </div>
+
+  <!-- Overlay -->
+  <div class="overlay" id="overlay"></div>
+
+<div id="previewSection">
+  <h3>Preview:</h3>
+  <div class="preview-container">
+    <img id="previewFront" style="display:none;">
+    <img id="previewBack" style="display:none;">
+    <embed id="pdfPreview" type="application/pdf" width="300" height="400" style="display:none;" />
+  </div>
+  
+  <iframe id="pdfPreview" style="display:none; width:100%; height:400px;"></iframe>
+<p id="pdfPasswordPreview" style="display:none; margin-top: 8px; font-weight: bold;"></p>
 </div>
 
 <!-- ✅ Shipping Address Form -->
 <div class="shipping-container">
-    <h2>Shipping Address</h2>
+    <h2>Enter your order details</h2>
+    <div style="text-align: center;">
+      <button id="uploadPDFBtn">Upload PDF</button>
+      <span><b>Or</b></span>
+  <button id="uploadImageBtn">Upload Images</button>
+    </div>
+    
     <form id="shippingForm">
         <input type="text" id="fullName" placeholder="Full Name" required>
         <input type="text" id="address" placeholder="Address" required>
@@ -75,82 +115,304 @@
 </div>
 
 <!-- ✅ Order Now Button -->
-<button id="orderBtn" class="sticky-order-btn">Proceed to Checkout</button>
-
-<!-- ✅ JavaScript -->
-<script>
-document.getElementById("fileInputFront").addEventListener("change", function (event) {
-    previewImage(event, "previewFront");
-});
-document.getElementById("fileInputBack").addEventListener("change", function (event) {
-    previewImage(event, "previewBack");
-});
-
-function previewImage(event, previewId) {
+<button id="orderBtn" class="sticky-order-btn">
+  <span id="orderBtnText">Proceed to Checkout</span>
+  <span id="orderSpinner" style="display: none;">
+    Processing... <span class="loader"></span>
+  </span>
+</button>
+  <!-- ✅ JavaScript -->
+  <script>
+  // ✅ Image Upload & Preview
+  document.getElementById("fileInputFront").addEventListener("change", checkImageUploadStatus);
+  document.getElementById("fileInputBack").addEventListener("change", checkImageUploadStatus);
+  
+  function checkImageUploadStatus() {
+    const frontInput = document.getElementById("fileInputFront");
+    const backInput = document.getElementById("fileInputBack");
+    const frontUploaded = frontInput.files.length > 0;
+    const backUploaded = backInput.files.length > 0;
+    
+    if (frontUploaded && backUploaded) {
+      document.getElementById("uploadImageBtn").innerHTML = "Images Uploaded ✓";
+      
+      // Show preview section
+      fadeIn("previewSection");
+      previewImage({ target: { files: frontInput.files } }, "previewFront");
+      previewImage({ target: { files: backInput.files } }, "previewBack");
+      
+      // Reset PDF
+      resetPDFInput();
+      
+    } else {
+      document.getElementById("uploadImageBtn").innerHTML = "Upload Images";
+    }
+  }
+  
+  // ✅ Image Preview Logic
+  function previewImage(event, previewId) {
     const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            document.getElementById(previewId).src = e.target.result;
-        };
-        reader.readAsDataURL(file);
+    
+    if (!file.type.startsWith("image/")) {
+      alert("⚠️ Please upload a valid image.");
+      return;
     }
-}
-// ✅ Check Image Size Function
-function checkImageSize(fileInput, maxSizeMB) {
-    const file = fileInput.files[0]; // Get selected file
-    if (file && file.size > maxSizeMB * 1024 * 1024) { 
-        alert(`❌ Image size is too large! Please upload a compressed image under ${maxSizeMB}MB.`);
-        return false; 
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = document.getElementById(previewId);
+      img.src = e.target.result;
+      img.style.display = "block";
+      img.classList.add("fade-zoom");
+      fadeIn("previewSection");
+      
+      // Hide PDF preview
+      document.getElementById("pdfPreview").style.display = "none";
+      document.getElementById("pdfPasswordPreview").style.display = "none";
+    };
+    reader.onerror = () => {
+      alert("⚠️ Error loading image. Please try again.");
+    };
+    reader.readAsDataURL(file);
+  }
+  
+  // ✅ PDF Upload & Preview
+  document.getElementById("fileInputPDF").addEventListener("change", function(event) {
+    const file = event.target.files[0];
+    
+    if (!file || file.type !== "application/pdf") {
+      alert("⚠️ Please upload a valid PDF file.");
+      return;
     }
-    return true;
-}
-
-// ✅ Modify Order Button Click Event
-document.getElementById("orderBtn").addEventListener("click", function () {
-    const fileInputFront = document.getElementById("fileInputFront");
-    const fileInputBack = document.getElementById("fileInputBack");
-
-    // ✅ Check Image Size (Max 2MB per Image)
-    if (!checkImageSize(fileInputFront, 2) || !checkImageSize(fileInputBack, 2)) {
-        return; // Stop checkout if images are too large
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      fadeIn("previewSection");
+      document.getElementById("pdfPreview").src = e.target.result;
+      document.getElementById("pdfPreview").style.display = "block";
+      document.getElementById("uploadPDFBtn").innerHTML = "PDF Uploaded ✓";
+      document.getElementById("pdfPreview").classList.add("fade-zoom");
+      
+      // Hide image previews
+      document.getElementById("previewFront").style.display = "none";
+      document.getElementById("previewBack").style.display = "none";
+      
+      // Reset images
+      resetImageInputs();
+      
+      // Show password if any
+      updatePasswordPreview();
+    };
+    reader.onerror = () => {
+      alert("⚠️ Error loading PDF. Please try again.");
+    };
+    reader.readAsDataURL(file);
+  });
+  
+  // ✅ Update PDF Password Preview
+  function updatePasswordPreview() {
+    const password = document.getElementById("pdfPassword").value.trim();
+    const passwordPreview = document.getElementById("pdfPasswordPreview");
+    
+    if (password) {
+      passwordPreview.textContent = "Password: " + password;
+      passwordPreview.style.display = "block";
+      passwordPreview.classList.add("fade-in");
+    } else {
+      passwordPreview.style.display = "none";
     }
-
-    // ✅ Proceed with order if images are valid
-    const productData = {
+  }
+  document.getElementById("pdfPassword").addEventListener("input", function() {
+    const isPDFVisible = document.getElementById("pdfPreview").style.display === "block";
+    if (isPDFVisible) {
+      updatePasswordPreview();
+    }
+  });
+  
+  // ✅ Reset Functions
+  function resetPDFInput() {
+    document.getElementById("fileInputPDF").value = "";
+    document.getElementById("pdfPreview").src = "";
+    document.getElementById("pdfPreview").style.display = "none";
+    document.getElementById("pdfPassword").value = "";
+    document.getElementById("pdfPasswordPreview").style.display = "none";
+    document.getElementById("uploadPDFBtn").innerHTML = "Upload PDF";
+  }
+  
+  function resetImageInputs() {
+    document.getElementById("fileInputFront").value = "";
+    document.getElementById("fileInputBack").value = "";
+    document.getElementById("previewFront").style.display = "none";
+    document.getElementById("previewBack").style.display = "none";
+    document.getElementById("uploadImageBtn").innerHTML = "Upload Images";
+  }
+  
+  // ✅ Animations
+  function fadeIn(id)  {
+    const el = document.getElementById(id);
+    el.style.opacity = 0;
+    el.style.display = "block";
+    setTimeout(() => {
+      el.style.transition = "opacity 0.4s ease";
+      el.style.opacity = 1;
+    }, 10);
+  }
+    
+    // ✅ Compress & Convert to Base64
+    function compressAndConvert(file, callback) {
+      new Compressor(file, {
+        quality: 0.6,
+        maxWidth: 800,
+        success(result) {
+          const reader = new FileReader();
+          reader.readAsDataURL(result);
+          reader.onload = () => callback(reader.result);
+        },
+        error(err) {
+          alert("Compression failed: " + err.message);
+        },
+      });
+    }
+    
+    // ✅ Loading Spinner Controls
+    function showProcessing() {
+      document.getElementById("orderBtnText").style.display = "none";
+      document.getElementById("orderSpinner").style.display = "inline";
+      document.getElementById("orderBtn").disabled = true;
+    }
+    
+    function hideProcessing() {
+      document.getElementById("orderBtnText").style.display = "inline";
+      document.getElementById("orderSpinner").style.display = "none";
+      document.getElementById("orderBtn").disabled = false;
+    }
+    
+    // ✅ Order Button Logic
+    document.getElementById("orderBtn").addEventListener("click", function() {
+      showProcessing();
+      
+      const fileInputFront = document.getElementById("fileInputFront");
+      const fileInputBack = document.getElementById("fileInputBack");
+      const fileInputPDF = document.getElementById("fileInputPDF");
+      const pdfPassword = document.getElementById("pdfPassword").value.trim();
+      
+      const isPDFUploaded = fileInputPDF.files.length > 0;
+      
+      const fullName = document.getElementById("fullName").value.trim();
+      const address = document.getElementById("address").value.trim();
+      const city = document.getElementById("city").value.trim();
+      const state = document.getElementById("state").value.trim();
+      const pincode = document.getElementById("pincode").value.trim();
+      const mobile = document.getElementById("mobile").value.trim();
+      
+      // Validations
+      if (!fullName || !address || !city || !state || !pincode || !mobile) {
+        alert("⚠️ Please fill in all fields.");
+        hideProcessing();
+        return;
+      }
+      
+      if (!/^\d{6}$/.test(pincode)) {
+        alert("⚠️ Invalid Pincode! It should be exactly 6 digits.");
+        hideProcessing();
+        return;
+      }
+      
+      if (!/^\d{10}$/.test(mobile)) {
+        alert("⚠️ Invalid Mobile Number! It should be exactly 10 digits.");
+        hideProcessing();
+        return;
+      }
+      
+      if (!isPDFUploaded && (!fileInputFront.files.length || !fileInputBack.files.length)) {
+        alert("⚠️ Please upload either both images or a PDF file.");
+        hideProcessing();
+        return;
+      }
+      
+      const productData = {
         name: "Aadhaar PVC Card",
-        price: "₹99",
+        price: "₹120",
         type: "PVC Aadhaar Card",
-        fullName: document.getElementById("fullName").value,
-        address: document.getElementById("address").value,
-        city: document.getElementById("city").value,
-        state: document.getElementById("state").value,
-        pincode: document.getElementById("pincode").value,
-        mobile: document.getElementById("mobile").value
-    };
-
-    // ✅ Convert Images to Base64
-    const readerFront = new FileReader();
-    readerFront.readAsDataURL(fileInputFront.files[0]);
-    readerFront.onload = function () {
-        productData.image1 = readerFront.result;
-
-        const readerBack = new FileReader();
-        readerBack.readAsDataURL(fileInputBack.files[0]);
-        readerBack.onload = function () {
-            productData.image2 = readerBack.result;
-
-            // ✅ Save to sessionStorage
+        fullName,
+        address,
+        city,
+        state,
+        pincode,
+        mobile,
+      };
+      
+      if (isPDFUploaded) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          productData.pdfBase64 = reader.result;
+          productData.pdfPassword = pdfPassword || null;
+          
+          try {
             sessionStorage.setItem("orderDetails", JSON.stringify(productData));
-
-            // ✅ Redirect to Checkout Page
             window.location.href = "checkout.html";
+          } catch (e) {
+            alert("⚠️ PDF too large. Please upload a lighter file.");
+            console.error("Storage Error:", e);
+            hideProcessing();
+          }
         };
-    };
-});
+        reader.onerror = (e) => {
+          alert("⚠️ Failed to read PDF file.");
+          console.error("PDF Error:", e);
+          hideProcessing();
+        };
+        reader.readAsDataURL(fileInputPDF.files[0]);
+      } else {
+        compressAndConvert(fileInputFront.files[0], (compressedFront) => {
+          productData.image1 = compressedFront;
+          compressAndConvert(fileInputBack.files[0], (compressedBack) => {
+            productData.image2 = compressedBack;
+            try {
+              sessionStorage.setItem("orderDetails", JSON.stringify(productData));
+              window.location.href = "checkout.html";
+            } catch (e) {
+              alert("⚠️ Image too large even after compression. Please use lighter images.");
+              console.error("Storage Error:", e);
+              hideProcessing();
+            }
+          });
+        });
+      }
+    });
+    
+    // ✅ Open popups
+    document.getElementById("uploadPDFBtn").addEventListener("click", () => {
+      document.getElementById("pdfPopup").style.display = "block";
+      document.getElementById("overlay").style.display = "block";
+    });
+    
+  document.getElementById("uploadImageBtn").addEventListener("click", () => {
+    document.getElementById("imagePopup").style.display = "block";
+    document.getElementById("overlay").style.display = "block";
+  });
+  
+  // ✅ Close popups when clicking overlay
+  document.getElementById("overlay").addEventListener("click", () => {
+    document.getElementById("pdfPopup").style.display = "none";
+    document.getElementById("imagePopup").style.display = "none";
+    document.getElementById("overlay").style.display = "none";
+  });
+  
+  // ✅ Close PDF Popup on submit
+  document.getElementById("submitPDF").addEventListener("click", () => {
+    document.getElementById("pdfPopup").style.display = "none";
+    document.getElementById("overlay").style.display = "none";
+  });
+  
+  // ✅ Close Image Popup on submit
+  document.getElementById("submitImages").addEventListener("click", () => {
+    document.getElementById("imagePopup").style.display = "none";
+    document.getElementById("overlay").style.display = "none";
+  });
+</script>
 
- console.log("Saved Order Details:", sessionStorage.getItem("orderDetails"));
-
+<script>
  //menu bar 
  function toggleMenu() {
    let nav = document.querySelector(".nav-links");
@@ -164,6 +426,32 @@ document.getElementById("orderBtn").addEventListener("click", function () {
      menuIcon.innerHTML = "☰";
    }
  }
+ 
+  document.addEventListener('DOMContentLoaded', function() {
+    const mainImage = document.getElementById('mainImage');
+    const thumbnails = document.querySelectorAll('.thumbnail-row img');
+    
+    thumbnails.forEach((thumb) => {
+      thumb.addEventListener('click', () => {
+        // Remove active class from all thumbnails
+        thumbnails.forEach((img) => img.classList.remove('active'));
+        
+        // Add active class to clicked thumbnail
+        thumb.classList.add('active');
+        
+        // Fade out main image
+        mainImage.style.opacity = 0;
+        
+        // Change image source after a short delay
+        setTimeout(() => {
+          mainImage.src = thumb.src;
+          
+          // Fade in main image
+          mainImage.style.opacity = 1;
+        }, 200);
+      });
+    });
+  });
 </script>
 <script type="module" src="./js/auth.js">./js/auth.js</script>
 </body>
