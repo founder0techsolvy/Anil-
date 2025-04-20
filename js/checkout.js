@@ -103,55 +103,54 @@ loadCheckoutData();
 // ✅ Load Order Details from sessionStorage
 
 function loadCheckoutData() {
+  setTimeout(() => {
+    const orderDetails = JSON.parse(sessionStorage.getItem("orderDetails"));
+    
+    if (!orderDetails) {
+      alert("⚠ No order details found! Redirecting to home.");
+      window.location.href = "index.html";
+      return;
+    }
+    
+    document.getElementById("orderName").textContent = orderDetails.name;
+    document.getElementById("orderPrice").textContent = orderDetails.price;
+    document.getElementById("orderType").textContent = `Product Type: ${orderDetails.type}`;
+    
+    // Show Image or PDF based on data
+    if (orderDetails.image1?.startsWith("data:image")) {
+      document.getElementById("orderImage1").src = orderDetails.image1;
+      document.getElementById("orderImage1").style.display = "block";
+    }
+    
+    if (orderDetails.image2?.startsWith("data:image")) {
+      document.getElementById("orderImage2").src = orderDetails.image2;
+      document.getElementById("orderImage2").style.display = "block";
+    }
 
-setTimeout(() => { // ✅ Smooth Transition ke liye Delay
+    if (orderDetails.pdfBase64?.startsWith("data:application/pdf")) {
+      document.getElementById("pdfPreviewFrame").src = orderDetails.pdfBase64;
+      document.getElementById("pdfContainer").style.display = "block";
 
-const orderDetails = JSON.parse(sessionStorage.getItem("orderDetails"));
-
-if (!orderDetails) {
-
-alert("⚠ No order details found! Redirecting to home.");
-
-window.location.href = "index.html";
-
-return;
-
+      if (orderDetails.pdfPassword) {
+        document.getElementById("pdfPasswordText").textContent = orderDetails.pdfPassword;
+        document.getElementById("pdfPasswordSection").style.display = "block";
+      }
+    }
+    
+    // Address
+    document.getElementById("fullName").textContent = orderDetails.fullName;
+    document.getElementById("address").textContent = orderDetails.address;
+    document.getElementById("city").textContent = orderDetails.city;
+    document.getElementById("state").textContent = orderDetails.state;
+    document.getElementById("pincode").textContent = orderDetails.pincode;
+    document.getElementById("mobile").textContent = orderDetails.mobile;
+    
+    stopLoader();
+  }, 1000);
 }
 
-document.getElementById("orderName").textContent = orderDetails.name;
-
-document.getElementById("orderPrice").textContent = orderDetails.price;
-
-document.getElementById("orderType").textContent = `Product Type: ${orderDetails.type}`;
-
-document.getElementById("orderImage1").src = orderDetails.image1 || "https://via.placeholder.com/200";
-
-document.getElementById("orderImage2").src = orderDetails.image2 || "https://via.placeholder.com/200";
-
-if (orderDetails.image2) {
-
-document.getElementById("orderImage2").style.display = "block";
-
-}
-
-document.getElementById("fullName").textContent = orderDetails.fullName;
-
-document.getElementById("address").textContent = orderDetails.address;
-
-document.getElementById("city").textContent = orderDetails.city;
-
-document.getElementById("state").textContent = orderDetails.state;
-
-document.getElementById("pincode").textContent = orderDetails.pincode;
-
-document.getElementById("mobile").textContent = orderDetails.mobile;
-
-stopLoader(); // ✅ Loader Stop jab sab kuch load ho jaye
-
-}, 1000);
-
-}
-
+console.log("PDF Base64: ", orderDetails.pdfBase64);
+console.log("PDF Password: ", orderDetails.pdfPassword);
 // ✅ Payment Integration with Razorpay
 
 document.getElementById("placeOrderBtn").addEventListener("click", async function() {
@@ -159,50 +158,24 @@ document.getElementById("placeOrderBtn").addEventListener("click", async functio
 try {
 
 const orderDetails = JSON.parse(sessionStorage.getItem("orderDetails"));
-
-
-
 const user = auth.currentUser;
-
 if (!user) {
-
-
-
   alert("Please login first!");
-
-
-
   return window.location.href = "login.html";
-
-
-
 }
 
 
 
 // Basic Validation
-
-
-
 if (!orderDetails?.price || !orderDetails?.name) {
-
-
-
   throw new Error("Invalid order details");
-
-
-
 }
 showLoader();
-
 
 // Convert Price to Paise
 const amount = parseInt(orderDetails.price.replace(/[^0-9]/g, "")) * 100;
 
 const options = {
-
-
-
   key: "rzp_test_NfDhAFYplEhZEf",
   amount: amount,
   currency: "INR",
@@ -218,29 +191,11 @@ const options = {
   handler: async function(response) {
 
     try {
-
-
-
       if (!response.razorpay_payment_id) {
-
-
-
         throw new Error("Payment failed");
-
-
-
       }
 
-
-
-      
-
-
-
       // Upload Images to Firebase Storage
-
-
-
       const uploadImage = async (imgData, imgName, onProgress) => {
 
 if (!imgData.startsWith("data:image/")) return imgData;
@@ -303,31 +258,49 @@ updateProgress(currentUpload, progress);
 
 ]);
 
-// Save order with image URLs
+//pdf upload logic 
+const uploadPDF = async (pdfData, pdfName, onProgress) => {
+  if (!pdfData.startsWith("data:application/pdf")) return pdfData;
 
+  const blob = await fetch(pdfData).then(r => r.blob());
+  const storageRef = ref(storage, `orders/${auth.currentUser.uid}/${Date.now()}_${pdfName}`);
+  const uploadTask = uploadBytesResumable(storageRef, blob);
 
+  return new Promise((resolve, reject) => {
+    uploadTask.on("state_changed",
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        if (onProgress) onProgress(progress.toFixed(0));
+      },
+      (error) => reject(error),
+      async () => {
+        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+        resolve(downloadURL);
+      }
+    );
+  });
+};
 
+let pdfUrl = "";
+
+if (orderDetails.pdfFile?.startsWith("data:application/pdf")) {
+  currentUpload = 3;
+  pdfUrl = await uploadPDF(orderDetails.pdfFile, "aadhar_file", (progress) => {
+    updateProgress(currentUpload, progress);
+  });
+}
       // Save order with paymentStatus
-
 await saveOrderToFirebase({
-
-...orderDetails,
-
-image1: image1Url,
-
-image2: image2Url || "No second image",
-
-email: user.email,
-
-uid: user.uid,
-
-paymentId: response.razorpay_payment_id,
-
-paymentStatus: "Paid",  // ✅ Payment Status Added
-
-timestamp: new Date().toISOString()
-
-});
+  ...orderDetails,
+  image1: image1Url || "No Image",
+  image2: image2Url || "No Second Image",
+  pdfFile: pdfUrl || "No PDF",
+  email: user.email,
+  uid: user.uid,
+  paymentId: response.razorpay_payment_id,
+  paymentStatus: "Paid",
+  timestamp: new Date().toISOString()
+}); 
 
 // ✅ Save Order Details in sessionStorage for order-success.html
 
