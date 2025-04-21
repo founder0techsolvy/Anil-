@@ -133,11 +133,12 @@ function loadCheckoutData() {
       // Handle PDF data
       if (orderDetails.pdfBase64?.startsWith("data:application/pdf")) {
         try {
-          document.getElementById("pdfPreviewFrame").src = orderDetails.pdfBase64;
+          const pdfPreview = document.getElementById("pdfPreviewFrame");
+          pdfPreview.src = orderDetails.pdfBase64;
           document.getElementById("pdfContainer").style.display = "block";
 
           if (orderDetails.pdfPassword) {
-            document.getElementById("pdfPasswordText").textContent = orderDetails.pdfPassword;
+            document.getElementById("pdfPasswordText").textContent = `Password: ${orderDetails.pdfPassword}`;
             document.getElementById("pdfPasswordSection").style.display = "block";
           }
         } catch (pdfError) {
