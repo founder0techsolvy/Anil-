@@ -54,6 +54,14 @@
             <img id="orderImage1" src="" alt="Front Side">
             <img id="orderImage2" src="" alt="Back Side" style="display: none"> <!-- Default Hidden -->
         </div>
+        <!-- In your checkout.html -->
+<div id="pdfContainer" style="display: none;">
+  <h3>PDF Preview:</h3>
+  <iframe id="pdfPreviewFrame" width="100%" height="400px" style="border: 1px solid #ddd;"></iframe>
+  <div id="pdfPasswordSection" style="display: none; margin-top: 10px;">
+    <p>PDF Password: <span id="pdfPasswordText"></span></p>
+  </div>
+</div>
         <div>
             <h3 id="orderName"></h3>
             <p id="orderPrice"></p>
