@@ -102,55 +102,66 @@ loadCheckoutData();
 
 // ✅ Load Order Details from sessionStorage
 
+// ✅ Load Order Details from sessionStorage
 function loadCheckoutData() {
   setTimeout(() => {
-    const orderDetails = JSON.parse(sessionStorage.getItem("orderDetails"));
-    
-    if (!orderDetails) {
-      alert("⚠ No order details found! Redirecting to home.");
-      window.location.href = "index.html";
-      return;
-    }
-    
-    document.getElementById("orderName").textContent = orderDetails.name;
-    document.getElementById("orderPrice").textContent = orderDetails.price;
-    document.getElementById("orderType").textContent = `Product Type: ${orderDetails.type}`;
-    
-    // Show Image or PDF based on data
-    if (orderDetails.image1?.startsWith("data:image")) {
-      document.getElementById("orderImage1").src = orderDetails.image1;
-      document.getElementById("orderImage1").style.display = "block";
-    }
-    
-    if (orderDetails.image2?.startsWith("data:image")) {
-      document.getElementById("orderImage2").src = orderDetails.image2;
-      document.getElementById("orderImage2").style.display = "block";
-    }
-
-    if (orderDetails.pdfBase64?.startsWith("data:application/pdf")) {
-      document.getElementById("pdfPreviewFrame").src = orderDetails.pdfBase64;
-      document.getElementById("pdfContainer").style.display = "block";
-
-      if (orderDetails.pdfPassword) {
-        document.getElementById("pdfPasswordText").textContent = orderDetails.pdfPassword;
-        document.getElementById("pdfPasswordSection").style.display = "block";
+    try {
+      const orderDetails = JSON.parse(sessionStorage.getItem("orderDetails"));
+      
+      if (!orderDetails) {
+        alert("⚠ No order details found! Redirecting to home.");
+        window.location.href = "index.html";
+        return;
       }
+      
+      // Basic order details
+      document.getElementById("orderName").textContent = orderDetails.name;
+      document.getElementById("orderPrice").textContent = orderDetails.price;
+      document.getElementById("orderType").textContent = `Product Type: ${orderDetails.type}`;
+      
+      // Show Image or PDF based on data
+      if (orderDetails.image1?.startsWith("data:image")) {
+        document.getElementById("orderImage1").src = orderDetails.image1;
+        document.getElementById("orderImage1").style.display = "block";
+      }
+      
+      if (orderDetails.image2?.startsWith("data:image")) {
+        document.getElementById("orderImage2").src = orderDetails.image2;
+        document.getElementById("orderImage2").style.display = "block";
+      }
+
+      // Handle PDF data
+      if (orderDetails.pdfBase64?.startsWith("data:application/pdf")) {
+        try {
+          document.getElementById("pdfPreviewFrame").src = orderDetails.pdfBase64;
+          document.getElementById("pdfContainer").style.display = "block";
+
+          if (orderDetails.pdfPassword) {
+            document.getElementById("pdfPasswordText").textContent = orderDetails.pdfPassword;
+            document.getElementById("pdfPasswordSection").style.display = "block";
+          }
+        } catch (pdfError) {
+          console.error("Error loading PDF:", pdfError);
+        }
+      }
+      
+      // Address details
+      document.getElementById("fullName").textContent = orderDetails.fullName;
+      document.getElementById("address").textContent = orderDetails.address;
+      document.getElementById("city").textContent = orderDetails.city;
+      document.getElementById("state").textContent = orderDetails.state;
+      document.getElementById("pincode").textContent = orderDetails.pincode;
+      document.getElementById("mobile").textContent = orderDetails.mobile;
+      
+    } catch (error) {
+      console.error("Error loading checkout data:", error);
+      alert("Error loading order details. Please try again.");
+      window.location.href = "index.html";
+    } finally {
+      stopLoader(); // Ensure loader is stopped in all cases
     }
-    
-    // Address
-    document.getElementById("fullName").textContent = orderDetails.fullName;
-    document.getElementById("address").textContent = orderDetails.address;
-    document.getElementById("city").textContent = orderDetails.city;
-    document.getElementById("state").textContent = orderDetails.state;
-    document.getElementById("pincode").textContent = orderDetails.pincode;
-    document.getElementById("mobile").textContent = orderDetails.mobile;
-    
-    stopLoader();
   }, 1000);
 }
-
-console.log("PDF Base64: ", orderDetails.pdfBase64);
-console.log("PDF Password: ", orderDetails.pdfPassword);
 // ✅ Payment Integration with Razorpay
 
 document.getElementById("placeOrderBtn").addEventListener("click", async function() {
