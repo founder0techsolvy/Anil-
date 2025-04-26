@@ -33,13 +33,20 @@
 <!-- ✅ Product Section with Full-width Main Image and Thumbnails -->
 <div class="product-container">
   <div class="product-gallery">
-    <img id="mainImage" class="main-image" src="aadhar_01.png" alt="Aadhaar PVC Card">
+    <img id="mainImage" class="main-image" src="https://codesparshofficial.github.io/Print420/img9.png" alt="Aadhaar PVC Card">
 <div class="thumbnail-wrapper">
   <div class="thumbnail-container">
     <div class="thumbnail-row">
       <img src="https://codesparshofficial.github.io/Print420/img9.png" class="active" alt="Thumbnail 1" />
       <img src="https://codesparshofficial.github.io/Print420/img8.png" alt="Thumbnail 2" />
       <img src="https://codesparshofficial.github.io/Print420/img7.png" alt="Thumbnail 3" />
+      <!-- Add more thumbnails here -->
+        <img src="https://codesparshofficial.github.io/Print420/img9.png" alt="Thumbnail 1" />
+
+      <img src="https://codesparshofficial.github.io/Print420/img8.png" alt="Thumbnail 2" />
+
+      <img src="https://codesparshofficial.github.io/Print420/img7.png" alt="Thumbnail 3" />
+      <!-- Add more thumbnails here -->
     </div>
   </div>
 </div>
@@ -48,7 +55,7 @@
   <div class="product-info">
     <h2>Aadhaar PVC Card</h2>
     <p>Get your Aadhaar printed on a durable PVC card. Sleek, water-resistant, and pocket-sized.</p>
-    <p class="price">Print + GST = ₹120</p>
+    <p class="price">Print + GST = ₹99</p>
     
     <ul>
       <li>Printed on high-quality PVC material</li>
@@ -59,9 +66,116 @@
     <h4 style="margin-top: 20px; color: green;">What’s in the Package?</h4>
     <ul>
       <li>1x PVC Aadhaar Card</li>
-      <li>2x Free Plastic Cover to protect your card</li>
+      <li>Free Plastic Cover to protect your card</li>
+      <li>Order tracking ID</li>
     </ul>
     
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #ffffff;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+    color: #333;
+  }
+
+  button {
+    padding: 10px 20px;
+    margin: 10px;
+    background-color: #c62828; /* deep red */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  button:hover {
+    background-color: #b71c1c; /* darker red on hover */
+  }
+
+  .popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    padding: 25px 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 25px rgba(198, 40, 40, 0.4);
+    z-index: 1000;
+    width: 90%;
+    max-width: 400px;
+    text-align: left;
+  }
+
+  .popup h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 20px;
+    color: #c62828;
+  }
+
+  .popup input[type="file"],
+  .popup input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+
+  .popup button {
+    background-color: #d32f2f;
+  }
+
+  .popup button:hover {
+    background-color: #b71c1c;
+  }
+
+  .overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 999;
+  }
+
+  #previewSection {
+    margin-top: 30px;
+    display: none;
+  }
+
+  #previewSection h3 {
+    margin-bottom: 15px;
+    color: #c62828;
+  }
+
+  .preview-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .preview-container img,
+  #pdfPreview {
+    max-width: 220px;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(198, 40, 40, 0.3);
+  }
+
+  #pdfPreview {
+    border: 1px solid #ccc;
+  }
+</style>
+
 
 
   <!-- PDF Upload Popup -->
@@ -121,272 +235,272 @@
     Processing... <span class="loader"></span>
   </span>
 </button>
-  <!-- ✅ JavaScript -->
-  <script>
-  // ✅ Image Upload & Preview
-  document.getElementById("fileInputFront").addEventListener("change", checkImageUploadStatus);
-  document.getElementById("fileInputBack").addEventListener("change", checkImageUploadStatus);
+<!-- ✅ JavaScript -->
+<script>
+// ✅ Image Upload & Preview
+document.getElementById("fileInputFront").addEventListener("change", checkImageUploadStatus);
+document.getElementById("fileInputBack").addEventListener("change", checkImageUploadStatus);
+
+function checkImageUploadStatus() {
+  const frontInput = document.getElementById("fileInputFront");
+  const backInput = document.getElementById("fileInputBack");
+  const frontUploaded = frontInput.files.length > 0;
+  const backUploaded = backInput.files.length > 0;
   
-  function checkImageUploadStatus() {
-    const frontInput = document.getElementById("fileInputFront");
-    const backInput = document.getElementById("fileInputBack");
-    const frontUploaded = frontInput.files.length > 0;
-    const backUploaded = backInput.files.length > 0;
+  if (frontUploaded && backUploaded) {
+    document.getElementById("uploadImageBtn").innerHTML = "Images Uploaded ✓";
     
-    if (frontUploaded && backUploaded) {
-      document.getElementById("uploadImageBtn").innerHTML = "Images Uploaded ✓";
-      
-      // Show preview section
-      fadeIn("previewSection");
-      previewImage({ target: { files: frontInput.files } }, "previewFront");
-      previewImage({ target: { files: backInput.files } }, "previewBack");
-      
-      // Reset PDF
-      resetPDFInput();
-      
-    } else {
-      document.getElementById("uploadImageBtn").innerHTML = "Upload Images";
-    }
-  }
-  
-  // ✅ Image Preview Logic
-  function previewImage(event, previewId) {
-    const file = event.target.files[0];
+    // Show preview section
+    fadeIn("previewSection");
+    previewImage({ target: { files: frontInput.files } }, "previewFront");
+    previewImage({ target: { files: backInput.files } }, "previewBack");
     
-    if (!file.type.startsWith("image/")) {
-      alert("⚠️ Please upload a valid image.");
-      return;
-    }
+    // Reset PDF
+    resetPDFInput();
     
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const img = document.getElementById(previewId);
-      img.src = e.target.result;
-      img.style.display = "block";
-      img.classList.add("fade-zoom");
-      fadeIn("previewSection");
-      
-      // Hide PDF preview
-      document.getElementById("pdfPreview").style.display = "none";
-      document.getElementById("pdfPasswordPreview").style.display = "none";
-    };
-    reader.onerror = () => {
-      alert("⚠️ Error loading image. Please try again.");
-    };
-    reader.readAsDataURL(file);
-  }
-  
-  // ✅ PDF Upload & Preview
-  document.getElementById("fileInputPDF").addEventListener("change", function(event) {
-    const file = event.target.files[0];
-    
-    if (!file || file.type !== "application/pdf") {
-      alert("⚠️ Please upload a valid PDF file.");
-      return;
-    }
-    
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      fadeIn("previewSection");
-      document.getElementById("pdfPreview").src = e.target.result;
-      document.getElementById("pdfPreview").style.display = "block";
-      document.getElementById("uploadPDFBtn").innerHTML = "PDF Uploaded ✓";
-      document.getElementById("pdfPreview").classList.add("fade-zoom");
-      
-      // Hide image previews
-      document.getElementById("previewFront").style.display = "none";
-      document.getElementById("previewBack").style.display = "none";
-      
-      // Reset images
-      resetImageInputs();
-      
-      // Show password if any
-      updatePasswordPreview();
-    };
-    reader.onerror = () => {
-      alert("⚠️ Error loading PDF. Please try again.");
-    };
-    reader.readAsDataURL(file);
-  });
-  
-  // ✅ Update PDF Password Preview
-  function updatePasswordPreview() {
-    const password = document.getElementById("pdfPassword").value.trim();
-    const passwordPreview = document.getElementById("pdfPasswordPreview");
-    
-    if (password) {
-      passwordPreview.textContent = "Password: " + password;
-      passwordPreview.style.display = "block";
-      passwordPreview.classList.add("fade-in");
-    } else {
-      passwordPreview.style.display = "none";
-    }
-  }
-  document.getElementById("pdfPassword").addEventListener("input", function() {
-    const isPDFVisible = document.getElementById("pdfPreview").style.display === "block";
-    if (isPDFVisible) {
-      updatePasswordPreview();
-    }
-  });
-  
-  // ✅ Reset Functions
-  function resetPDFInput() {
-    document.getElementById("fileInputPDF").value = "";
-    document.getElementById("pdfPreview").src = "";
-    document.getElementById("pdfPreview").style.display = "none";
-    document.getElementById("pdfPassword").value = "";
-    document.getElementById("pdfPasswordPreview").style.display = "none";
-    document.getElementById("uploadPDFBtn").innerHTML = "Upload PDF";
-  }
-  
-  function resetImageInputs() {
-    document.getElementById("fileInputFront").value = "";
-    document.getElementById("fileInputBack").value = "";
-    document.getElementById("previewFront").style.display = "none";
-    document.getElementById("previewBack").style.display = "none";
+  } else {
     document.getElementById("uploadImageBtn").innerHTML = "Upload Images";
   }
+}
+
+// ✅ Image Preview Logic
+function previewImage(event, previewId) {
+  const file = event.target.files[0];
   
-  // ✅ Animations
-  function fadeIn(id)  {
-    const el = document.getElementById(id);
-    el.style.opacity = 0;
-    el.style.display = "block";
-    setTimeout(() => {
-      el.style.transition = "opacity 0.4s ease";
-      el.style.opacity = 1;
-    }, 10);
+  if (!file.type.startsWith("image/")) {
+    alert("⚠️ Please upload a valid image.");
+    return;
   }
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = document.getElementById(previewId);
+    img.src = e.target.result;
+    img.style.display = "block";
+    img.classList.add("fade-zoom");
+    fadeIn("previewSection");
     
-    // ✅ Compress & Convert to Base64
-    function compressAndConvert(file, callback) {
-      new Compressor(file, {
-        quality: 0.6,
-        maxWidth: 800,
-        success(result) {
-          const reader = new FileReader();
-          reader.readAsDataURL(result);
-          reader.onload = () => callback(reader.result);
-        },
-        error(err) {
-          alert("Compression failed: " + err.message);
-        },
-      });
-    }
+    // Hide PDF preview
+    document.getElementById("pdfPreview").style.display = "none";
+    document.getElementById("pdfPasswordPreview").style.display = "none";
+  };
+  reader.onerror = () => {
+    alert("⚠️ Error loading image. Please try again.");
+  };
+  reader.readAsDataURL(file);
+}
+
+// ✅ PDF Upload & Preview
+document.getElementById("fileInputPDF").addEventListener("change", function(event) {
+  const file = event.target.files[0];
+  
+  if (!file || file.type !== "application/pdf") {
+    alert("⚠️ Please upload a valid PDF file.");
+    return;
+  }
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    fadeIn("previewSection");
+    document.getElementById("pdfPreview").src = e.target.result;
+    document.getElementById("pdfPreview").style.display = "block";
+    document.getElementById("uploadPDFBtn").innerHTML = "PDF Uploaded ✓";
+    document.getElementById("pdfPreview").classList.add("fade-zoom");
     
-    // ✅ Loading Spinner Controls
-    function showProcessing() {
-      document.getElementById("orderBtnText").style.display = "none";
-      document.getElementById("orderSpinner").style.display = "inline";
-      document.getElementById("orderBtn").disabled = true;
-    }
+    // Hide image previews
+    document.getElementById("previewFront").style.display = "none";
+    document.getElementById("previewBack").style.display = "none";
     
-    function hideProcessing() {
-      document.getElementById("orderBtnText").style.display = "inline";
-      document.getElementById("orderSpinner").style.display = "none";
-      document.getElementById("orderBtn").disabled = false;
-    }
+    // Reset images
+    resetImageInputs();
     
-    // ✅ Order Button Logic
-    document.getElementById("orderBtn").addEventListener("click", function() {
-      showProcessing();
-      
-      const fileInputFront = document.getElementById("fileInputFront");
-      const fileInputBack = document.getElementById("fileInputBack");
-      const fileInputPDF = document.getElementById("fileInputPDF");
-      const pdfPassword = document.getElementById("pdfPassword").value.trim();
-      
-      const isPDFUploaded = fileInputPDF.files.length > 0;
-      
-      const fullName = document.getElementById("fullName").value.trim();
-      const address = document.getElementById("address").value.trim();
-      const city = document.getElementById("city").value.trim();
-      const state = document.getElementById("state").value.trim();
-      const pincode = document.getElementById("pincode").value.trim();
-      const mobile = document.getElementById("mobile").value.trim();
-      
-      // Validations
-      if (!fullName || !address || !city || !state || !pincode || !mobile) {
-        alert("⚠️ Please fill in all fields.");
-        hideProcessing();
-        return;
-      }
-      
-      if (!/^\d{6}$/.test(pincode)) {
-        alert("⚠️ Invalid Pincode! It should be exactly 6 digits.");
-        hideProcessing();
-        return;
-      }
-      
-      if (!/^\d{10}$/.test(mobile)) {
-        alert("⚠️ Invalid Mobile Number! It should be exactly 10 digits.");
-        hideProcessing();
-        return;
-      }
-      
-      if (!isPDFUploaded && (!fileInputFront.files.length || !fileInputBack.files.length)) {
-        alert("⚠️ Please upload either both images or a PDF file.");
-        hideProcessing();
-        return;
-      }
-      
-      const productData = {
-        name: "Aadhaar PVC Card",
-        price: "₹120",
-        type: "PVC Aadhaar Card",
-        fullName,
-        address,
-        city,
-        state,
-        pincode,
-        mobile,
-      };
-      
-      if (isPDFUploaded) {
+    // Show password if any
+    updatePasswordPreview();
+  };
+  reader.onerror = () => {
+    alert("⚠️ Error loading PDF. Please try again.");
+  };
+  reader.readAsDataURL(file);
+});
+
+// ✅ Update PDF Password Preview
+function updatePasswordPreview() {
+  const password = document.getElementById("pdfPassword").value.trim();
+  const passwordPreview = document.getElementById("pdfPasswordPreview");
+  
+  if (password) {
+    passwordPreview.textContent = "Password: " + password;
+    passwordPreview.style.display = "block";
+    passwordPreview.classList.add("fade-in");
+  } else {
+    passwordPreview.style.display = "none";
+  }
+}
+document.getElementById("pdfPassword").addEventListener("input", function() {
+  const isPDFVisible = document.getElementById("pdfPreview").style.display === "block";
+  if (isPDFVisible) {
+    updatePasswordPreview();
+  }
+});
+
+// ✅ Reset Functions
+function resetPDFInput() {
+  document.getElementById("fileInputPDF").value = "";
+  document.getElementById("pdfPreview").src = "";
+  document.getElementById("pdfPreview").style.display = "none";
+  document.getElementById("pdfPassword").value = "";
+  document.getElementById("pdfPasswordPreview").style.display = "none";
+  document.getElementById("uploadPDFBtn").innerHTML = "Upload PDF";
+}
+
+function resetImageInputs() {
+  document.getElementById("fileInputFront").value = "";
+  document.getElementById("fileInputBack").value = "";
+  document.getElementById("previewFront").style.display = "none";
+  document.getElementById("previewBack").style.display = "none";
+  document.getElementById("uploadImageBtn").innerHTML = "Upload Images";
+}
+
+// ✅ Animations
+function fadeIn(id)  {
+  const el = document.getElementById(id);
+  el.style.opacity = 0;
+  el.style.display = "block";
+  setTimeout(() => {
+    el.style.transition = "opacity 0.4s ease";
+    el.style.opacity = 1;
+  }, 10);
+}
+  
+  // ✅ Compress & Convert to Base64
+  function compressAndConvert(file, callback) {
+    new Compressor(file, {
+      quality: 0.6,
+      maxWidth: 800,
+      success(result) {
         const reader = new FileReader();
-        reader.onload = () => {
-          productData.pdfBase64 = reader.result;
-          productData.pdfPassword = pdfPassword || null;
-          
+        reader.readAsDataURL(result);
+        reader.onload = () => callback(reader.result);
+      },
+      error(err) {
+        alert("Compression failed: " + err.message);
+      },
+    });
+  }
+  
+  // ✅ Loading Spinner Controls
+  function showProcessing() {
+    document.getElementById("orderBtnText").style.display = "none";
+    document.getElementById("orderSpinner").style.display = "inline";
+    document.getElementById("orderBtn").disabled = true;
+  }
+  
+  function hideProcessing() {
+    document.getElementById("orderBtnText").style.display = "inline";
+    document.getElementById("orderSpinner").style.display = "none";
+    document.getElementById("orderBtn").disabled = false;
+  }
+  
+  // ✅ Order Button Logic
+  document.getElementById("orderBtn").addEventListener("click", function() {
+    showProcessing();
+    
+    const fileInputFront = document.getElementById("fileInputFront");
+    const fileInputBack = document.getElementById("fileInputBack");
+    const fileInputPDF = document.getElementById("fileInputPDF");
+    const pdfPassword = document.getElementById("pdfPassword").value.trim();
+    
+    const isPDFUploaded = fileInputPDF.files.length > 0;
+    
+    const fullName = document.getElementById("fullName").value.trim();
+    const address = document.getElementById("address").value.trim();
+    const city = document.getElementById("city").value.trim();
+    const state = document.getElementById("state").value.trim();
+    const pincode = document.getElementById("pincode").value.trim();
+    const mobile = document.getElementById("mobile").value.trim();
+    
+    // Validations
+    if (!fullName || !address || !city || !state || !pincode || !mobile) {
+      alert("⚠️ Please fill in all fields.");
+      hideProcessing();
+      return;
+    }
+    
+    if (!/^\d{6}$/.test(pincode)) {
+      alert("⚠️ Invalid Pincode! It should be exactly 6 digits.");
+      hideProcessing();
+      return;
+    }
+    
+    if (!/^\d{10}$/.test(mobile)) {
+      alert("⚠️ Invalid Mobile Number! It should be exactly 10 digits.");
+      hideProcessing();
+      return;
+    }
+    
+    if (!isPDFUploaded && (!fileInputFront.files.length || !fileInputBack.files.length)) {
+      alert("⚠️ Please upload either both images or a PDF file.");
+      hideProcessing();
+      return;
+    }
+    
+    const productData = {
+      name: "Aadhaar PVC Card",
+      price: "₹99",
+      type: "PVC Aadhaar Card",
+      fullName,
+      address,
+      city,
+      state,
+      pincode,
+      mobile,
+    };
+    
+    if (isPDFUploaded) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        productData.pdfBase64 = reader.result;
+        productData.pdfPassword = pdfPassword || null;
+        
+        try {
+          sessionStorage.setItem("orderDetails", JSON.stringify(productData));
+          window.location.href = "checkout.html";
+        } catch (e) {
+          alert("⚠️ PDF too large. Please upload a lighter file.");
+          console.error("Storage Error:", e);
+          hideProcessing();
+        }
+      };
+      reader.onerror = (e) => {
+        alert("⚠️ Failed to read PDF file.");
+        console.error("PDF Error:", e);
+        hideProcessing();
+      };
+      reader.readAsDataURL(fileInputPDF.files[0]);
+    } else {
+      compressAndConvert(fileInputFront.files[0], (compressedFront) => {
+        productData.image1 = compressedFront;
+        compressAndConvert(fileInputBack.files[0], (compressedBack) => {
+          productData.image2 = compressedBack;
           try {
             sessionStorage.setItem("orderDetails", JSON.stringify(productData));
             window.location.href = "checkout.html";
           } catch (e) {
-            alert("⚠️ PDF too large. Please upload a lighter file.");
+            alert("⚠️ Image too large please use lighter images.");
             console.error("Storage Error:", e);
             hideProcessing();
           }
-        };
-        reader.onerror = (e) => {
-          alert("⚠️ Failed to read PDF file.");
-          console.error("PDF Error:", e);
-          hideProcessing();
-        };
-        reader.readAsDataURL(fileInputPDF.files[0]);
-      } else {
-        compressAndConvert(fileInputFront.files[0], (compressedFront) => {
-          productData.image1 = compressedFront;
-          compressAndConvert(fileInputBack.files[0], (compressedBack) => {
-            productData.image2 = compressedBack;
-            try {
-              sessionStorage.setItem("orderDetails", JSON.stringify(productData));
-              window.location.href = "checkout.html";
-            } catch (e) {
-              alert("⚠️ Image too large even after compression. Please use lighter images.");
-              console.error("Storage Error:", e);
-              hideProcessing();
-            }
-          });
         });
-      }
-    });
-    
-    // ✅ Open popups
-    document.getElementById("uploadPDFBtn").addEventListener("click", () => {
-      document.getElementById("pdfPopup").style.display = "block";
-      document.getElementById("overlay").style.display = "block";
-    });
-    
+      });
+    }
+  });
+  
+  // ✅ Open popups
+  document.getElementById("uploadPDFBtn").addEventListener("click", () => {
+    document.getElementById("pdfPopup").style.display = "block";
+    document.getElementById("overlay").style.display = "block";
+  });
+  
   document.getElementById("uploadImageBtn").addEventListener("click", () => {
     document.getElementById("imagePopup").style.display = "block";
     document.getElementById("overlay").style.display = "block";
