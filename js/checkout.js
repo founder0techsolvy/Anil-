@@ -100,67 +100,81 @@ loadCheckoutData();
 
 });
 
-// ✅ Load Order Details from sessionStorage
-
-// ✅ Load Order Details from sessionStorage
+// ✅ Load Order Details from sessionStorage (Fixed Properly)
 function loadCheckoutData() {
   setTimeout(() => {
-    try {
-      const orderDetails = JSON.parse(sessionStorage.getItem("orderDetails"));
-      
-      if (!orderDetails) {
-        alert("⚠ No order details found! Redirecting to home.");
-        window.location.href = "index.html";
-        return;
-      }
-      
-      // Basic order details
-      document.getElementById("orderName").textContent = orderDetails.name;
-      document.getElementById("orderPrice").textContent = orderDetails.price;
-      document.getElementById("orderType").textContent = `Product Type: ${orderDetails.type}`;
-      
-      // Show Image or PDF based on data
-      if (orderDetails.image1?.startsWith("data:image")) {
-        document.getElementById("orderImage1").src = orderDetails.image1;
-        document.getElementById("orderImage1").style.display = "block";
-      }
-      
-      if (orderDetails.image2?.startsWith("data:image")) {
-        document.getElementById("orderImage2").src = orderDetails.image2;
-        document.getElementById("orderImage2").style.display = "block";
-      }
-
-      // Handle PDF data
-      if (orderDetails.pdfBase64?.startsWith("data:application/pdf")) {
-        try {
-          const pdfPreview = document.getElementById("pdfPreviewFrame");
-          pdfPreview.src = orderDetails.pdfBase64;
-          document.getElementById("pdfContainer").style.display = "block";
-
-          if (orderDetails.pdfPassword) {
-            document.getElementById("pdfPasswordText").textContent = `Password: ${orderDetails.pdfPassword}`;
-            document.getElementById("pdfPasswordSection").style.display = "block";
-          }
-        } catch (pdfError) {
-          console.error("Error loading PDF:", pdfError);
-        }
-      }
-      
-      // Address details
-      document.getElementById("fullName").textContent = orderDetails.fullName;
-      document.getElementById("address").textContent = orderDetails.address;
-      document.getElementById("city").textContent = orderDetails.city;
-      document.getElementById("state").textContent = orderDetails.state;
-      document.getElementById("pincode").textContent = orderDetails.pincode;
-      document.getElementById("mobile").textContent = orderDetails.mobile;
-      
-    } catch (error) {
-      console.error("Error loading checkout data:", error);
-      alert("Error loading order details. Please try again.");
+    const orderDetails = JSON.parse(sessionStorage.getItem("orderDetails"));
+    if (!orderDetails) {
+      alert("⚠ No order details found! Redirecting to home.");
       window.location.href = "index.html";
-    } finally {
-      stopLoader(); // Ensure loader is stopped in all cases
+      return;
     }
+    
+    // Fill basic order details
+    document.getElementById("orderName").textContent = orderDetails.name || "";
+    document.getElementById("orderPrice").textContent = orderDetails.price || "";
+    document.getElementById("orderType").textContent = `Product Type: ${orderDetails.type || ""}`;
+    document.getElementById("fullName").textContent = orderDetails.fullName || "";
+    document.getElementById("address").textContent = orderDetails.address || "";
+    document.getElementById("city").textContent = orderDetails.city || "";
+    document.getElementById("state").textContent = orderDetails.state || "";
+    document.getElementById("pincode").textContent = orderDetails.pincode || "";
+    document.getElementById("mobile").textContent = orderDetails.mobile || "";
+    
+    // Clear previous preview
+    document.getElementById("orderImage1").style.display = "none";
+    document.getElementById("orderImage2").style.display = "none";
+    const pdfPreviewContainer = document.getElementById("pdfPreviewContainer");
+    if (pdfPreviewContainer) {
+      pdfPreviewContainer.innerHTML = "";
+      pdfPreviewContainer.style.display = "none";
+    }
+    const pdfPasswordDisplay = document.getElementById("pdfPasswordDisplay");
+    if (pdfPasswordDisplay) {
+      pdfPasswordDisplay.textContent = "";
+      pdfPasswordDisplay.style.display = "none";
+    }
+    
+    // Check for PDF or Images
+if (orderDetails.pdfBase64) {
+  if (pdfPreviewContainer) {
+    pdfPreviewContainer.style.display = "flex";
+    pdfPreviewContainer.style.flexDirection = "column";
+    pdfPreviewContainer.style.justifyContent = "center";
+    pdfPreviewContainer.style.alignItems = "center";
+    pdfPreviewContainer.style.marginTop = "20px"; // upar thoda gap
+    
+    pdfPreviewContainer.innerHTML = `
+      <embed src="${orderDetails.pdfBase64}" type="application/pdf" width="250px" height="350px" style="border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);" />
+    `;
+  }
+  
+  // ✅ Show Password if available
+  if (orderDetails.pdfPassword && orderDetails.pdfPassword.trim() !== "") {
+    if (pdfPasswordDisplay) {
+      pdfPasswordDisplay.style.display = "block";
+      pdfPasswordDisplay.style.marginTop = "15px"; // embed ke neeche gap
+      pdfPasswordDisplay.style.textAlign = "center"; // center alignment
+      pdfPasswordDisplay.style.color = "#28a745"; // Bright professional green color
+      pdfPasswordDisplay.style.fontWeight = "bold";
+      pdfPasswordDisplay.style.fontSize = "1.2rem"; // Slightly bigger text
+      pdfPasswordDisplay.style.fontFamily = "'Segoe UI', sans-serif"; // Professional font
+      pdfPasswordDisplay.textContent = `PDF Password: ${orderDetails.pdfPassword}`;
+    }
+  }
+}
+else if (orderDetails.image1 && orderDetails.image2) {
+      // ✅ Images Upload detected
+      const img1 = document.getElementById("orderImage1");
+      img1.src = orderDetails.image1;
+      img1.style.display = "block";
+      
+      const img2 = document.getElementById("orderImage2");
+      img2.src = orderDetails.image2;
+      img2.style.display = "block";
+    }
+    
+    stopLoader();
   }, 1000);
 }
 // ✅ Payment Integration with Razorpay
@@ -170,24 +184,50 @@ document.getElementById("placeOrderBtn").addEventListener("click", async functio
 try {
 
 const orderDetails = JSON.parse(sessionStorage.getItem("orderDetails"));
+
+
+
 const user = auth.currentUser;
+
 if (!user) {
+
+
+
   alert("Please login first!");
+
+
+
   return window.location.href = "login.html";
+
+
+
 }
 
 
 
 // Basic Validation
+
+
+
 if (!orderDetails?.price || !orderDetails?.name) {
+
+
+
   throw new Error("Invalid order details");
+
+
+
 }
 showLoader();
+
 
 // Convert Price to Paise
 const amount = parseInt(orderDetails.price.replace(/[^0-9]/g, "")) * 100;
 
 const options = {
+
+
+
   key: "rzp_test_NfDhAFYplEhZEf",
   amount: amount,
   currency: "INR",
@@ -203,11 +243,29 @@ const options = {
   handler: async function(response) {
 
     try {
+
+
+
       if (!response.razorpay_payment_id) {
+
+
+
         throw new Error("Payment failed");
+
+
+
       }
 
+
+
+      
+
+
+
       // Upload Images to Firebase Storage
+
+
+
       const uploadImage = async (imgData, imgName, onProgress) => {
 
 if (!imgData.startsWith("data:image/")) return imgData;
@@ -270,49 +328,31 @@ updateProgress(currentUpload, progress);
 
 ]);
 
-//pdf upload logic 
-const uploadPDF = async (pdfData, pdfName, onProgress) => {
-  if (!pdfData.startsWith("data:application/pdf")) return pdfData;
+// Save order with image URLs
 
-  const blob = await fetch(pdfData).then(r => r.blob());
-  const storageRef = ref(storage, `orders/${auth.currentUser.uid}/${Date.now()}_${pdfName}`);
-  const uploadTask = uploadBytesResumable(storageRef, blob);
 
-  return new Promise((resolve, reject) => {
-    uploadTask.on("state_changed",
-      (snapshot) => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        if (onProgress) onProgress(progress.toFixed(0));
-      },
-      (error) => reject(error),
-      async () => {
-        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-        resolve(downloadURL);
-      }
-    );
-  });
-};
 
-let pdfUrl = "";
-
-if (orderDetails.pdfFile?.startsWith("data:application/pdf")) {
-  currentUpload = 3;
-  pdfUrl = await uploadPDF(orderDetails.pdfFile, "aadhar_file", (progress) => {
-    updateProgress(currentUpload, progress);
-  });
-}
       // Save order with paymentStatus
+
 await saveOrderToFirebase({
-  ...orderDetails,
-  image1: image1Url || "No Image",
-  image2: image2Url || "No Second Image",
-  pdfFile: pdfUrl || "No PDF",
-  email: user.email,
-  uid: user.uid,
-  paymentId: response.razorpay_payment_id,
-  paymentStatus: "Paid",
-  timestamp: new Date().toISOString()
-}); 
+
+...orderDetails,
+
+image1: image1Url,
+
+image2: image2Url || "No second image",
+
+email: user.email,
+
+uid: user.uid,
+
+paymentId: response.razorpay_payment_id,
+
+paymentStatus: "Paid",  // ✅ Payment Status Added
+
+timestamp: new Date().toISOString()
+
+});
 
 // ✅ Save Order Details in sessionStorage for order-success.html
 
